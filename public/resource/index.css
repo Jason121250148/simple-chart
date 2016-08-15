@@ -1,0 +1,58 @@
+ul
+{
+    padding-left: 10px;
+}
+li
+{
+    list-style: none;
+    border-bottom: 1px solid gray;
+    line-height: 40px;
+    margin-right: 10px;
+    overflow-x:hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+.chart
+{
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+.rooms
+{
+    flex: 0 0 400px;
+    border: 1px solid gray;
+    display: flex;
+}
+#talks
+{
+    flex: 1 0 auto;
+}
+#friends
+{
+    flex: 0 0 100px;
+    border-right: 1px dashed gray;
+}
+.container
+{
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+.content
+{
+    flex: 1 0 auto;
+    border: 1px solid gray;
+}
+.input
+{
+    flex: 0 0 50px;
+    border: 1px solid gray;
+}
+.input input
+{
+    display: inline-block;
+    margin-top: 10px;
+    height: 40px;
+    width: 800px;
+}

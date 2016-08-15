@@ -1,0 +1,131 @@
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <script src="./resource/vendor/socketIo/socket.io.js"></script>
+    <script src="./resource/vendor/jquery/jquery.js"></script>
+    <link rel="stylesheet" href="./resource/index.css">
+  </head>
+
+  <body>
+    <div class="chart">
+        <div class="rooms">
+            <div id = "friends">
+                <ul></ul>
+                <!-- <button type="button" id = "create-group">创建群组</button> -->
+            </div>
+            </ul>
+            <ul id = "talks">
+                <li id = "private">私信：暂无对话</li>
+            </ul>
+        </div>
+        <div class="container">
+            <div class="content">
+                <ul id = "privateMessages"></ul>
+                <ul id = "groupMessages"></ul>
+            </div>
+            <div action="" class="input">
+                <form action="">
+                    <input id = "m" type="text">
+                    <button type="submit">发送</button>
+                </form>
+            </div>
+        </div>
+    </div>
+  </body>
+
+  <script>
+      var privateChart = true;
+      var fromUserName = window.location.hash.slice(1);
+      var chosenUser = null;
+      var socket = io.connect('/message-enter');
+      socket.on("init", function(info){
+          $("#friends > ul > li").remove();
+          $("#talks > .group").remove();
+          for(let user of info.users)
+          {
+              $("#friends > ul").append($("<li>").text(user.name));
+          }
+          for(let room of info.rooms)
+          {
+              $("#talks").append($("<li>").text(room).addClass("group"));
+          }
+          socket.emit("login", fromUserName);
+
+      });
+
+      socket.on('show message', function(msg){
+          $("#groupMessages").hide();
+          $("#privateMessages").show();
+          $("#privateMessages").append($('<li>').text(msg));
+      });
+
+      socket.on("show group message", function(msg){
+          $("#privateMessages").hide();
+          $("#groupMessages").show();
+          $("#groupMessages").append($('<li>').text(msg));
+      });
+
+      $("#friends").on("click", "li", function(e){
+          if (privateChart)
+          {
+              $("#private").text(`和${$(this).text()}私聊中`);
+              chosenUser = $(this).text();
+          }
+      });
+
+      $("#talks").on("click", "li", function(e){
+          $("#talks > li").css("background", "white");
+          $(this).css("background", "#dcdada");
+          if ($(this).attr("id") === "private")
+          {
+              privateChart = true;
+              $("#groupMessages").hide();
+          }
+          else
+          {
+              privateChart = false;
+              $("#privateMessages").hide();
+          }
+      });
+
+      $("#talks").on("click", ".group", function(e){
+          $("#groupMessages > li").remove();
+          socket.emit("room change", $(this).text());
+      });
+
+      $('form').submit(function(){
+          if (privateChart && chosenUser)
+          {
+              socket.emit("send message", {
+                  privateChart,
+                  fromUserName,
+                  toUserName: chosenUser,
+                  message: $('#m').val()
+              });
+          }
+          else
+          {
+              socket.emit("send group message", {
+                  fromUserName,
+                  message: $('#m').val()
+              });
+          }
+          $('#m').val('');
+          return false;
+      });
+
+
+
+  // socket.on("private message", function(msg){
+  //     console.log("private: ", msg);
+  //     $('#private-message').append($('<li>').text(msg));
+  // });
+  //
+  // $(".rooms").on("click", "li", function(e){
+  //     console.log("Change to room: " + $(this).text());
+  //     $("#messages>li").remove();
+  //     socket.emit("roomChange", $(this).text());
+  // });
+  </script>
+
+</html>
